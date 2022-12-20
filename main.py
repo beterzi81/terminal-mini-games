@@ -13,30 +13,40 @@ def clear():#terminali temizlemek için oluşturduğumuz bir fonksiyon
         else:
             _ = system('clear')
     
-
-
+oyunSayaci=0
+kazanmaSayaci=0
+kaybetmeSayaci=0
 def blackjack(x):
-    oyuncununEli=[]
-    krupiyeninEli=[]
+    global oyunSayaci
+    global kazanmaSayaci
+    global kaybetmeSayaci
+    oyunSayaci=0
+    kazanmaSayaci=0
+    kaybetmeSayaci=0
     clear()
     deste = ["♥A","♥2","♥3","♥4","♥5","♥6","♥7","♥8","♥9","♥10","♥J","♥Q","♥K","♤A","♤2","♤3","♤4","♤5","♤6","♤7","♤8","♤9","♤10","♤J","♤Q","♤K","♦A","♦2","♦3","♦4","♦5","♦6","♦7","♦8","♦9","♦10","♦J","♦Q","♦K","♧A","♧2","♧3","♧4","♧5","♧6","♧7","♧8","♧9","♧10","♧J","♧Q","♧K"]
+    deste = x * deste
+    random.shuffle(deste)
+    print("Destedeki kart sayısı: "+ str(len(deste)))
+
     
+    def ayniDesteyleDevam(deste):
+        
+        clear()
+        print("Destede kalan kart sayısı: "+ str(len(deste)))
+        
+        oyunuBaslat(deste)
+
     def oyuncuyaKartAc(deste):
         oyuncununEli.append(deste.pop())
         print("Oyuncuya çekilen kart: " + oyuncununEli[-1])
         
-
     def krupiyeyeKartAc(deste):
         krupiyeninEli.append(deste.pop())
         if(len(krupiyeninEli)==2):
             print("Krupiyeye çekilen kart: #")
         else:
             print("Krupiyeye çekilen kart: " + krupiyeninEli[-1])
-
-
-    deste = x * deste
-    random.shuffle(deste)
-    print(len(deste))
 
     def eliHesapla(el):
         toplam = 0
@@ -57,11 +67,11 @@ def blackjack(x):
                 toplam+=(int(i[1:]))
         return toplam
 
-
     def eliGoster(x):
         oyuncuElDegeri=eliHesapla(oyuncununEli)
         krupiyeElDegeri=eliHesapla(krupiyeninEli)
-
+        print("Kazanılan oyun sayısı: "+ str(kazanmaSayaci) +"\nKaybedilen oyun sayısı: "+str(kaybetmeSayaci))#ileride oran kısmı eklenecek +"\nKazanma oranı: "+str(kazanmaSayaci/oyunSayaci-1)
+        print("\nDestede kalan kart sayısı: "+ str(len(deste)))
         if (x ==1):
             oyuncununEliString=""
             for i in oyuncununEli:
@@ -80,34 +90,49 @@ def blackjack(x):
             print("Erol dörtyüzdört hll")
 
     def oyunuBaslat(deste):
+        global oyunSayaci
+        oyunSayaci+=1
+        global oyuncununEli
+        oyuncununEli=[]
+        global krupiyeninEli
+        krupiyeninEli=[]
         oyuncuyaKartAc(deste)
-        sleep(0.5)
+        sleep(1.5)
         krupiyeyeKartAc(deste)
-        sleep(0.5)
+        sleep(1.5)
         oyuncuyaKartAc(deste)
-        sleep(0.5)
+        sleep(1.5)
         krupiyeyeKartAc(deste)
-        sleep(0.5)
+        sleep(1.5)
         clear()
         eliIlerlet()
 
+    def oyunSonucu(x):
+        global kazanmaSayaci
+        global kaybetmeSayaci
+        kazanmaSayaci+= 1 if x == 1 else 0
+        kaybetmeSayaci+= 1 if x == 2 else 0
+        sonuc = "Berabere bitti!" if x  == 0 else "Oyunu kazandınız!" if x == 1 else "Oyunu kaybettiniz!"
+        return sonuc
 
     def eliDegerlendir():
         krupiyeElDegeri=eliHesapla(krupiyeninEli)
         oyuncuElDegeri=eliHesapla(oyuncununEli)
         if(krupiyeElDegeri == oyuncuElDegeri or (krupiyeElDegeri>21 and oyuncuElDegeri>21)):#21'in altındaki eşitlik ve iki tarafın da 21'i geçmesi durumu
-            print("Berabere bitti!")
+            print(oyunSonucu(0))
         elif(oyuncuElDegeri==21):#eşitlik olmadığı durumda oyuncunun 21 değerini bulması
-            print("Oyunu kazandınız!")
+            print(oyunSonucu(1))
         elif((oyuncuElDegeri>krupiyeElDegeri) and not oyuncuElDegeri>21 ):#oyuncunun 21'i geçmediği fakat krupiyeyi geçtiği durum
-            print("Oyunu kazandınız!")
+            print(oyunSonucu(1))
         elif(krupiyeElDegeri>21 and (not oyuncuElDegeri>21)):#oyuncunun 21 değerini geçmediği fakat krupiyenin 21 değerini aştığı durum
-            print("Oyunu kazandınız!")
+            print(oyunSonucu(1))
         else:
-            print("Oyunu kaybettiniz!")
-
-
-
+            print(oyunSonucu(2))
+        tamamMiDevamMi = input("Devam etmek için Y/y harfini giriniz:\n")
+        if(tamamMiDevamMi=="y" or tamamMiDevamMi=="Y"):
+            ayniDesteyleDevam(deste)
+        else:
+            pass
 
     def eliSonlandir():
         clear()
@@ -121,8 +146,6 @@ def blackjack(x):
             eliSonlandir()
         else:
             eliDegerlendir()
-
-
 
     def eliIlerlet():
         clear()
@@ -143,16 +166,8 @@ def blackjack(x):
             input("\nArtık hamle yapamazsınız. Eli ilerletmek için herhangi bir tuşa basınız:\n")
             eliSonlandir()
     
-    #print(deste[0] +"-  -" + deste[52]+"-  -" +deste[104]+"-  -" +deste[156])#küçük bir kontrol
-    '''
-
-    for k in deste:
-        print(k)
-        sleep(0.5)
-        clear()
-
-    '''
     oyunuBaslat(deste)
+   
 clear()
 
 oyunlar=["Blackjack : B","Poker : P (Hazır değil)"]
